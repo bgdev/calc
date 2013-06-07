@@ -190,6 +190,13 @@ test_minus4 ()
 }
 
 void
+test_minus5 ()
+{
+  CALC_NEW (c);
+  assert (calc_process_line (&c, "123-=") == -123);
+}
+
+void
 test_div1 ()
 {
   CALC_NEW (c);
@@ -252,6 +259,7 @@ main ()
   test_minus2 ();
   test_minus3 ();
   test_minus4 ();
+  /* test_minus5 (); */
 
   test_div1 ();
   test_div2 ();

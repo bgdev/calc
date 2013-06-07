@@ -5,7 +5,6 @@
 
 struct calc {
   int x, y;
-  int state;
   int op;
   int flags;
 };

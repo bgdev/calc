@@ -2,14 +2,10 @@
 #include <ctype.h>
 #include <stdio.h>              /* TODO */
 
-#define STATE_CLEAR 3
-#define STATE_APPEND 4
-#define STATE_EQ 5
-
-#define FLAG_PENDING_EQ 0x1
-#define FLAG_FIRST 0x2
-#define FLAG_PREV_EQ 0x4
-#define FLAG_ERR 0x8
+#define FLAG_APPEND     0x1
+#define FLAG_ERR        0x2
+#define FLAG_PENDING_EQ 0x8
+#define FLAG_PREV_EQ    0x10
 
 int copy_x (struct calc *c);
 int eq (struct calc *c);
@@ -22,16 +18,15 @@ int set_flag (struct calc *c, int flag, int on);
 void calc_init (struct calc *c)
 {
   c->x = c->y = 0;
-  c->state = STATE_APPEND;
   c->op = '+';
-  c->flags = FLAG_FIRST;
+  c->flags = FLAG_APPEND;
 }
 
 int
 calc_process_line (struct calc *calc, char *line)
 {
   char c;
-  float res;
+  int res;
 
   while ((c = *line++) != '\0')
     res = calc_process_cmd (calc, c);
@@ -47,34 +42,29 @@ calc_process_cmd (struct calc *c, char cmd)
 
   if (isdigit (cmd))
     {
-      if (c->state != STATE_APPEND)
-        c->x = cmd - '0';
+      if (!set_flag (c, FLAG_APPEND, 1))
+        {
+          c->x = cmd - '0';
+          set_flag (c, FLAG_PENDING_EQ, 1);
+        }
       else
         c->x = c->x * 10 + (cmd - '0');
-      c->state = STATE_APPEND;
-
-      if (is_flag_on (c, FLAG_FIRST))
-        set_flag (c, FLAG_FIRST, 0);
-      else
-        set_flag (c, FLAG_PENDING_EQ, 1);
     }
   else if (is_operation (cmd))
     {
-      set_flag (c, FLAG_FIRST, 0);
-
       if (is_flag_on (c, FLAG_PENDING_EQ))
         eq (c);
 
       c->y = c->x;
       c->op = cmd;
 
-      c->state = STATE_CLEAR;
+      set_flag (c, FLAG_APPEND, 0);
       set_flag (c, FLAG_PREV_EQ, 0);
     }
   else if (cmd == '=')
     {
       eq (c);
-      c->state = STATE_EQ;
+      set_flag (c, FLAG_APPEND, 0);
     }
 
   /* printf ("cmd=%c, x=%d, y=%d\n", cmd, c->x, c->y); */
