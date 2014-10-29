@@ -3,10 +3,12 @@
 
 #define CALC_NEW(name) struct calc name; calc_init (&name);
 
+
 struct calc {
-  int x, y;
-  int op;
-  int flags;
+  int x, y;     /* Register one and two */
+  int flags;    /* Register three */
+  int op;       /* Operation is part of the flags register originally */
+  int tmp;      /* Register four */
 };
 
 void calc_init (struct calc *);

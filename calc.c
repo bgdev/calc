@@ -74,9 +74,9 @@ calc_process_cmd (struct calc *c, char cmd)
 int
 copy_x (struct calc *c)
 {
-  int tmp = c->y;
+  c->tmp = c->y;
   c->y = c->x;
-  return tmp;
+  return c->tmp;
 }
 
 int
@@ -114,9 +114,9 @@ is_operation (char c)
 void
 swap_xy (struct calc *c)
 {
-  int tmp = c->x;
+  c->tmp = c->x;
   c->x = c->y;
-  c->y = tmp;
+  c->y = c->tmp;
 }
 
 
@@ -133,8 +133,7 @@ is_flag_on (struct calc *c, int flag)
 int
 set_flag (struct calc *c, int flag, int on)
 {
-  int prev;
-  prev = is_flag_on (c, flag);
+  int prev = is_flag_on (c, flag);
 
   if (on)
     c->flags |= flag;
